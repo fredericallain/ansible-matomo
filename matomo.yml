@@ -1,0 +1,11 @@
+---
+
+- hosts: matomo
+  gather_facts: true
+  become: true
+  strategy: free
+  roles:
+    - role: prereq
+    - role: lamp_install
+    - role: mysql_secure_installation
+    - role: matomo_install

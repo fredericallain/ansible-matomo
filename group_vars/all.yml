@@ -1,0 +1,16 @@
+---
+ansible_user: <USERNAME>
+ansible_email: <MAIL@DOMAIN.TLD>
+systemd_dir: /etc/systemd/system
+
+system_timezone: "Europe/Paris"
+
+mysql_root_pass: '' #Leave empty for first install 
+new_mysql_root_pass: '<StrongPassword>'
+
+matomo_db_user: <USERNAME>
+matomo_db_password: '<StrongPassword>'
+matomo_table_prefix: <PREFIX>
+matomo_salt: "<StrongSalt>"
+matomo_admin_email: <MAIL@DOMAIN.TLD>
+matomo_url: <DOMAIN.TLD>

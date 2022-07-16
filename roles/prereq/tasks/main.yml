@@ -1,0 +1,17 @@
+---
+- name: Set same timezone on every Server
+  community.general.timezone:
+    name: "{{ system_timezone }}"
+
+- name: install mandatory package
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+  with_items:
+    - lsb-release
+    - ca-certificates
+    - apt-transport-https
+    - software-properties-common
+    - gnupg2

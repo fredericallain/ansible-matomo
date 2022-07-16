@@ -1,0 +1,55 @@
+---
+- name: Setup Matomo Database
+  community.mysql.mysql_user:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ mysql_root_pass }}"
+    name: '{{ matomo_db_user }}'
+    password: "{{ matomo_db_password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+
+- name: Wget and unzip latest Matomo in /var/www
+  ansible.builtin.unarchive:
+    src: https://builds.matomo.org/matomo-latest.zip
+    dest: /var/www/
+    remote_src: yes
+    owner: www-data
+    group: www-data
+
+- name: Remove instruction file
+  ansible.builtin.file:
+    path: /var/www/How to install Matomo.html
+    state: absent
+
+- name: Set up matomo config file
+  ansible.builtin.template:
+    src: "config.ini.php.j2"
+    dest: "/var/www/matomo/config/config.ini.php"
+    owner: www-data
+    group: www-data
+
+- name: Set up Apache virtuahHost
+  ansible.builtin.template:
+    src: "matomo.conf.j2"
+    dest: "/etc/apache2/sites-available/matomo.conf"
+
+- name: Enable new site
+  ansible.builtin.shell: /usr/sbin/a2ensite matomo.conf
+
+- name: Disable default Apache site
+  ansible.builtin.shell: /usr/sbin/a2dissite 000-default.conf
+  notify: Reload Apache
+
+- name: Setup cron job
+  ansible.builtin.cron:
+    name: "Matomo"
+    state: present
+    minute: "5"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: www-data
+    job: '/usr/bin/php /var/www/matomo/console core:archive --url={{ matomo_url }} > /home/{{ ansible_user }}/matomo-archive.log'
+    cron_file: matomo
