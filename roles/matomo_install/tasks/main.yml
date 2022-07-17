@@ -9,6 +9,14 @@
     priv: '*.*:ALL,GRANT'
     state: present
 
+- name: create a new database
+  community.mysql.mysql_db:
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+    login_user: root
+    login_password: "{{ new_mysql_root_pass }}"
+    name: "{{ observium_db_user }}"
+    state: present
+
 - name: Wget and unzip latest Matomo in /var/www
   ansible.builtin.unarchive:
     src: https://builds.matomo.org/matomo-latest.zip
